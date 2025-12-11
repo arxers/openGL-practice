@@ -1,0 +1,6 @@
+*.d
+*.o
+openGLTutorial
+lib/include/GLFW/
+lib/glfw
+lib/lib
