@@ -2,7 +2,7 @@ ROOT := $(CURDIR)
 
 NAME = openGLTutorial
 
-SRCS_APP := src/main.cpp src/Shader.cpp src/VAO.cpp src/VBO.cpp src/EBO.cpp
+SRCS_APP := src/main.cpp src/Shader.cpp src/VAO.cpp src/VBO.cpp src/EBO.cpp src/stb.cpp
 SRCS_C   := lib/glad/glad.c
 
 OBJ	:= $(SRCS_APP:.cpp=.o)
