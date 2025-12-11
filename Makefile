@@ -1,22 +1,39 @@
-NAME = openGLTutorial
-SRC = src/main.cpp src/glad.c src/Shader.cpp src/VAO.cpp src/VBO.cpp src/EBO.cpp
+ROOT := $(CURDIR)
 
-OBJ = $(patsubst %.cpp,%.o, $(patsubst %.c,%.o,$(SRC)))
-DEP = $(patsubst %.cpp,%.d, $(patsubst %.c,%.d,$(SRC)))
+NAME = openGLTutorial
+
+SRCS_APP := src/main.cpp src/Shader.cpp src/VAO.cpp src/VBO.cpp src/EBO.cpp
+SRCS_C   := lib/glad/glad.c
+
+OBJ	:= $(SRCS_APP:.cpp=.o)
+DEP := $(SRCS_APP:.cpp=.d)
 
 CXX = g++
-CC 	= gcc
-CXXFLAGS = -Wall -Wextra -Werror -MMD -Ilib/include -Ilib/glfw/include
-LDFLAGS = -Llib/lib -lglfw3 -lGL -lm -ldl -lpthread
+CC  = gcc
+
+CXXFLAGS = -Wall -Wextra -Werror -MMD -I$(ROOT)/lib/include -I$(ROOT)/lib/glfw/include -Iinc -I$(ROOT)/lib/glad/include
+CFLAGS   = -Wall -Wextra -Werror -I$(ROOT)/lib/include -I$(ROOT)/lib/glfw/include -Iinc -I$(ROOT)/lib/glad/include
+
+GLFW_DIR = lib/glfw
+GLFW_INSTALL_DIR = lib
+
+LIBS_DIR := lib
+LIBGLAD := $(LIBS_DIR)/libglad.a
+
+LDFLAGS = -L$(ROOT)/$(GLFW_INSTALL_DIR)/lib -L$(LIBS_DIR) -lglad -lglfw3 -lGL -lm -ldl -lpthread
 
 RED		= \033[1;31m
 GREEN	= \033[1;32m
 RESET	= \033[0m
 
-GLFW_DIR = lib/glfw
-GLFW_INSTALL_DIR = lib
+all: glfw-build $(LIBGLAD) $(NAME)
 
-all: glfw-build $(NAME)
+$(LIBGLAD): $(SRCS_C)
+	@mkdir -p $(LIBS_DIR)
+	@echo "Compiling glad..."
+	@$(CC) -Iinc -I$(ROOT)/lib/include -c $< -o $(LIBS_DIR)/glad.o
+	@ar rcs $@ $(LIBS_DIR)/glad.o
+	@rm -f $(LIBS_DIR)/glad.o
 
 $(NAME): $(OBJ)
 	@echo "Compiler flags:		$(GREEN)$(CXXFLAGS)$(RESET)"
@@ -29,33 +46,33 @@ glfw-clone:
 	fi
 
 glfw-build: glfw-clone
-	@if [ ! -f $(abspath $(GLFW_INSTALL_DIR))/lib/libglfw3.a ]; then \
-        echo "Building and installing GLFW..."; \
-        cd $(GLFW_DIR) && mkdir -p build && cd build && \
-        cmake .. -DGLFW_BUILD_WAYLAND=OFF -DCMAKE_INSTALL_PREFIX=$(abspath $(GLFW_INSTALL_DIR)) && \
-        make && make install; \
-    fi
-	cp -r $(GLFW_DIR)/include/GLFW $(abspath $(GLFW_INSTALL_DIR))/include/ 2>/dev/null || true
-
-%.o: %.c
-	@echo "Compiling .o file:	$(GREEN)(+) $@$(RESET)"
-	@$(CC) $(CXXFLAGS) -c $< -o $@
+	@if [ ! -f $(ROOT)/$(GLFW_INSTALL_DIR)/lib/libglfw3.a ]; then \
+		echo "Building and installing GLFW..."; \
+		cd $(GLFW_DIR) && mkdir -p build && cd build && \
+		cmake .. -DGLFW_BUILD_WAYLAND=OFF -DCMAKE_INSTALL_PREFIX=$(ROOT)/$(GLFW_INSTALL_DIR) && \
+		make && make install; \
+		cp -r $(GLFW_DIR)/include/GLFW $(ROOT)/$(GLFW_INSTALL_DIR)/include/ 2>/dev/null || true; \
+	fi
 
 %.o: %.cpp
-	@echo "Compiling .o file:	$(GREEN)(+) $@$(RESET)"
+	@echo "Compiling C++: $@"
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
+%.o: %.c
+	@echo "Compiling C: $@"
+	@$(CC) $(CFLAGS) -c $< -o $@
+
 clean:
-	@echo "Removing dependancies:	$(RED)(-) $(OBJ) $(DEP)$(RESET)"
-	@rm -f $(OBJ) $(DEP)
+	@echo "Removing dependancies:	$(RED)(-) $(OBJ) $(DEP) $(LIBGLAD)$(RESET)"
+	@rm -f $(OBJ) $(DEP) $(LIBGLAD)
 
 clean-binary: clean
-	@echo "Removing binary file:	$(RED)(-) $(NAME)$(RESET)"
+	@echo "Removing binary:	$(RED)(-) $(NAME)$(RESET)"
 	@rm -f $(NAME)
 
-fclean: clean-binary clean-glfw
+fclean: clean-binary glfw-clean
 
-clean-glfw:
+glfw-clean:
 	@echo "Removing GLFW install and source:	$(RED)(-) $(GLFW_DIR)$(RESET)"
 	@rm -rf $(GLFW_DIR)
 	@rm -rf $(GLFW_INSTALL_DIR)/include/GLFW
@@ -68,4 +85,4 @@ re: clean-binary all
 
 -include $(DEP)
 
-.PHONY: all clean clean-binary fclean clean-glfw g re
+.PHONY: all clean clean-binary fclean glfw-clean g re
