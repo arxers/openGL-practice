@@ -1,11 +1,8 @@
 NAME = openGLTutorial
-SRC = src/main.cpp src/glad.c src/shaderClass.cpp
+SRC = src/main.cpp src/glad.c src/Shader.cpp src/VAO.cpp src/VBO.cpp src/EBO.cpp
 
-# produce .o for both .cpp and .c files
-OBJ = $(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(SRC)))
-
-# produce .d only for .cpp files (dependency files)
-DEP = $(patsubst %.cpp,%.d,$(filter %.cpp,$(SRC)))
+OBJ = $(patsubst %.cpp,%.o, $(patsubst %.c,%.o,$(SRC)))
+DEP = $(patsubst %.cpp,%.d, $(patsubst %.c,%.d,$(SRC)))
 
 CXX = @c++
 CC 	= gcc
@@ -47,17 +44,21 @@ clean:
 	@echo "Removing dependancies:	$(RED)(-) $(OBJ) $(DEP)$(RESET)"
 	@rm -f $(OBJ) $(DEP)
 
-fclean: clean
+clean_binary: clean
 	@echo "Removing binary file:	$(RED)(-) $(NAME)$(RESET)"
 	@rm -f $(NAME)
+
+fclean: clean_binary clean_glfw
+
+clean_glfw:
 	@echo "Removing GLFW folder:	$(RED)(-) $(GLFW_DIR)$(RESET)"
 	@rm -rf $(GLFW_DIR)
 
 g: CXXFLAGS += -g
 g: re
 
-re: fclean all
+re: clean_binary all
 
 -include $(DEP)
 
-.PHONY: all clean fclean re g
+.PHONY: all clean clean_binary fclean clean_glfw g re
