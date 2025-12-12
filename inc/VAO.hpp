@@ -10,7 +10,7 @@
  * with a GL_ELEMENT_ARRAY_BUFFER (EBO). The VAO records how vertex data
  * (from VBOs) is interpreted during draw calls. It is NOT the buffer that
  * stores vertex data itself — that is the VBO's job.
- */ 
+ */
 class VAO
 {
 public:
@@ -20,7 +20,7 @@ public:
     VAO();
 
     // Links a VBO Attribute to the VAO using a certain layout
-    void LinkAttrib(VBO VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset);
+    void LinkAttrib(VBO &VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void *offset);
     // Binds the VAO
     void Bind();
     // Unbinds the VAO

@@ -8,6 +8,7 @@
 #include "../inc/VAO.hpp"
 #include "../inc/VBO.hpp"
 #include "../inc/EBO.hpp"
+#include "../inc/Texture.hpp"
 
 using std::sqrt;
 
@@ -90,33 +91,8 @@ int main()
     GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
     // Texture
-    int widthImg, heightImg, numColCh;
-    stbi_set_flip_vertically_on_load(1);
-    unsigned char* bytes = stbi_load("resources/textures/popcat.jpg", &widthImg, &heightImg, &numColCh, 0);
-
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    // float flatColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    // glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, flatColor);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, widthImg, heightImg, 0, GL_RGB, GL_UNSIGNED_BYTE, bytes);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    stbi_image_free(bytes);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    GLuint tex0Uni = glGetUniformLocation(shaderProgram.ID, "tex0");
-    shaderProgram.Activate();
-    glUniform1i(tex0Uni, 0);
+    Texture popcat("resources/textures/popcat.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+    popcat.texUnit(shaderProgram, "tex0", 0);
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -129,7 +105,8 @@ int main()
         shaderProgram.Activate();
         // Assigns a value to the uniform; NOTE: Must be done after shaderProgram.activate()
         glUniform1f(uniID, 0.0f);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        // Binds texture so that it appears in rendering
+        popcat.Bind();
         // Bind the VAO so OpenGL knows to use it
         VAO1.Bind();
         // Draw the triangle using the GL_TRIANGLES primitive
@@ -146,7 +123,7 @@ int main()
     VBO1.Delete();
     EBO1.Delete();
     shaderProgram.Delete();
-    glDeleteTextures(1, &texture);
+    popcat.Delete();
 
     // Delete window before ending the program
     glfwDestroyWindow(window);
