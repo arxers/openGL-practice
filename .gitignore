@@ -3,5 +3,7 @@
 openGLTutorial
 lib/include/GLFW/
 lib/glfw
+lib/glm
 lib/lib
 lib/libglad.a
+lib/include/glm/

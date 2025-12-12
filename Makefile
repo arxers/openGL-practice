@@ -17,6 +17,8 @@ CFLAGS   = -Wall -Wextra -Werror -I$(ROOT)/lib/include -I$(ROOT)/lib/glfw/includ
 GLFW_DIR = lib/glfw
 GLFW_INSTALL_DIR = lib
 
+GLM_DIR = lib/glm
+
 LIBS_DIR := lib
 LIBGLAD := $(LIBS_DIR)/libglad.a
 
@@ -26,7 +28,7 @@ RED		= \033[1;31m
 GREEN	= \033[1;32m
 RESET	= \033[0m
 
-all: glfw-build $(LIBGLAD) $(NAME)
+all: glfw-build glm-clone $(LIBGLAD) $(NAME)
 
 $(LIBGLAD): $(SRCS_C)
 	@mkdir -p $(LIBS_DIR)
@@ -39,6 +41,12 @@ $(NAME): $(OBJ)
 	@echo "Compiler flags:		$(GREEN)$(CXXFLAGS)$(RESET)"
 	@echo "\nCreated binary file:	$(GREEN)(+) $(NAME)$(RESET)"
 	@$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME) $(LDFLAGS)
+
+glm-clone:
+	@if [ ! -d $(ROOT)/lib/glm ]; then \
+		git clone https://github.com/g-truc/glm.git $(ROOT)/lib/glm; \
+		cp -r $(GLM_DIR)/glm $(ROOT)/lib/include; \
+	fi
 
 glfw-clone:
 	@if [ ! -d $(GLFW_DIR) ]; then \
@@ -70,13 +78,18 @@ clean-binary: clean
 	@echo "Removing binary:	$(RED)(-) $(NAME)$(RESET)"
 	@rm -f $(NAME)
 
-fclean: clean-binary glfw-clean
+fclean: clean-binary glfw-clean glm-clean
 
 glfw-clean:
 	@echo "Removing GLFW install and source:	$(RED)(-) $(GLFW_DIR)$(RESET)"
 	@rm -rf $(GLFW_DIR)
 	@rm -rf $(GLFW_INSTALL_DIR)/include/GLFW
 	@rm -rf $(GLFW_INSTALL_DIR)/lib
+
+glm-clean:
+	@echo "Removing GLM files"
+	@rm -rf $(GLM_DIR)
+	@rm -rf $(ROOT)/lib/include/glm 
 
 g: CXXFLAGS += -g
 g: re
