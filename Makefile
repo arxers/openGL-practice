@@ -11,8 +11,8 @@ DEP := $(SRCS_APP:.cpp=.d)
 CXX = g++
 CC  = gcc
 
-CXXFLAGS = -Wall -Wextra -Werror -MMD -I$(ROOT)/lib/include -I$(ROOT)/lib/glfw/include -Iinc -I$(ROOT)/lib/glad/include
-CFLAGS   = -Wall -Wextra -Werror -I$(ROOT)/lib/include -I$(ROOT)/lib/glfw/include -Iinc -I$(ROOT)/lib/glad/include
+CXXFLAGS = -Wall -Wextra -Werror -MMD -I$(ROOT)/lib/include -I$(ROOT)/lib/glfw/include -I$(ROOT)/lib/glad/include
+CFLAGS   = -Wall -Wextra -Werror -I$(ROOT)/lib/include -I$(ROOT)/lib/glfw/include -I$(ROOT)/lib/glad/include
 
 GLFW_DIR = lib/glfw
 GLFW_INSTALL_DIR = lib
@@ -33,7 +33,7 @@ all: glfw-build glm-clone $(LIBGLAD) $(NAME)
 $(LIBGLAD): $(SRCS_C)
 	@mkdir -p $(LIBS_DIR)
 	@echo "Compiling glad..."
-	@$(CC) -Iinc -I$(ROOT)/lib/include -c $< -o $(LIBS_DIR)/glad.o
+	@$(CC) -I$(ROOT)/lib/include -c $< -o $(LIBS_DIR)/glad.o
 	@ar rcs $@ $(LIBS_DIR)/glad.o
 	@rm -f $(LIBS_DIR)/glad.o
 
