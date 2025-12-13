@@ -70,7 +70,7 @@ void Shader::compileErrors(unsigned int shader, std::string type)
         {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
             std::cout << "SHADER_COMPILATION_ERROR for: " << type << "\n"
-                      << std::endl;
+                      << infoLog << std::endl;
         }
     }
     else
@@ -80,7 +80,7 @@ void Shader::compileErrors(unsigned int shader, std::string type)
         {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
             std::cout << "SHADER_LINKING_ERROR for: " << type << "\n"
-                      << std::endl;
+                      << infoLog << std::endl;
         } 
     }
 }
